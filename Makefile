@@ -11,12 +11,12 @@ $(info Modules were not checked out... use git clone --recursive in the future. 
 $(shell git submodule update --init --recursive 2>/dev/null)
 endif
 
-setbaud : setbaud.c
+ssetbaud : ssetbaud.c
 	gcc -o $@ $^
 
-monitor : setbaud
+monitor : ssetbaud
 	stty -F /dev/ttyUSB0 -echo raw
-	./setbaud /dev/ttyUSB0 50000
+	./ssetbaud /dev/ttyUSB0 50000
 	cat /dev/ttyUSB0
 
 # Example for a custom rule.

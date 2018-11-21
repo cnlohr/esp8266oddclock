@@ -20,6 +20,8 @@
 #include <string.h>
 #include "nosdk8266.h"
 
+//#define DOXMITX 1
+
 /*==============================================================================
  * Process Defines
  *============================================================================*/
@@ -71,7 +73,7 @@ struct cnespsend
  * This is a timer set up in user_main() which is called every 100ms, forever
  * @param arg unused
  */
-static void ICACHE_FLASH_ATTR timer100ms(void *arg)
+static void ICACHE_FLASH_ATTR timerfn(void *arg)
 {
 static int lcode;
 	static int k;
@@ -80,7 +82,7 @@ static int lcode;
 	struct cnespsend thisesp;
 
 		static int mode = 0;
-//#ifdef DOXMIT
+//#if DOXMIT
 
 	if( lcode == 0 || lcode == 1  || lcode == 2)
 	{
@@ -145,7 +147,7 @@ static int lcode;
 	}*/
 
 	uint8_t data[300];
-#ifdef DOXMIT
+#if DOXMITX
 	espNowSend( data, 300 );
 #endif
 	CSTick( 1 ); // Send a one to uart
@@ -437,7 +439,7 @@ void ICACHE_FLASH_ATTR user_init(void)
 
 	// Set timer100ms to be called every 100ms
 	os_timer_disarm(&some_timer);
-	os_timer_setfn(&some_timer, (os_timer_func_t *)timer100ms, NULL);
+	os_timer_setfn(&some_timer, (os_timer_func_t *)timerfn, NULL);
 	os_timer_arm(&some_timer, 1, 1);
 
 //This is actually 0x88.  You can set this to 0xC8 to double-overclock the low-end bus.
@@ -457,8 +459,10 @@ void ICACHE_FLASH_ATTR user_init(void)
 
 //	pico_i2c_writereg(103,4,1,0x88);	pico_i2c_writereg(103,4,2,0x91);		
 
-		pico_i2c_writereg(103,4,1,0x48);
-		pico_i2c_writereg(103,4,2,0xf1);	
+
+	//Start the chip in slow-mode (1080 / 16) + no processor multiplier, so 32.5 MHz main system clock.
+//		pico_i2c_writereg(103,4,1,0x48);
+//		pico_i2c_writereg(103,4,2,0xf1);	
 
 
 	os_printf( "Boot Ok.\n" );
